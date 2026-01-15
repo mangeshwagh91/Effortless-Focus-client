@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Mail, Check, ExternalLink, RefreshCw, Bell, Inbox } from 'lucide-react';
 import { Button } from './ui/button';
 import { useAuth } from '@/hooks/useAuth';
+import { demoEmails, isDemoMode } from '@/lib/demoData';
 
 export function SocialMode() {
   const [emails, setEmails] = useState([]);
@@ -25,7 +26,7 @@ export function SocialMode() {
 
   // Group emails by category
   const emailsByCategory = emails.reduce((acc, email) => {
-    const category = email.category || 'other';
+    const category = email.aiSummary?.category || email.category || 'other';
     if (!acc[category]) acc[category] = [];
     acc[category].push(email);
     return acc;
@@ -34,6 +35,16 @@ export function SocialMode() {
   const filteredEmails = selectedCategory === 'all' 
     ? emails 
     : emailsByCategory[selectedCategory] || [];
+
+  // Load demo emails if in demo mode
+  useEffect(() => {
+    if (isDemoMode() && isAuthenticated) {
+      setEmails(demoEmails);
+      setUnreadCount(demoEmails.filter(e => !e.read).length);
+      setGmailAccessToken('demo-token'); // Set a dummy token to skip the connect screen
+      return;
+    }
+  }, [isAuthenticated]);
 
   // Check if user has connected Gmail
   useEffect(() => {
@@ -290,7 +301,8 @@ export function SocialMode() {
       ) : (
         <div className="space-y-3">
           {filteredEmails.map((email) => {
-            const catInfo = categoryLabels[email.category || 'other'];
+            const emailCategory = email.aiSummary?.category || email.category || 'other';
+            const catInfo = categoryLabels[emailCategory] || categoryLabels.other;
             return (
               <div
                 key={email.id}
@@ -308,14 +320,14 @@ export function SocialMode() {
                       {email.subject || '(No Subject)'}
                     </h3>
                     <p className="text-xs text-muted-foreground truncate">
-                      {email.from}
+                      {email.from?.name || email.from}
                     </p>
                   </div>
                   <ExternalLink className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary transition-colors flex-shrink-0" />
                 </div>
                 
                 <p className="text-sm text-muted-foreground/90 leading-relaxed mt-3">
-                  {email.aiSummary || email.snippet}
+                  {email.aiSummary?.summary || email.aiSummary || email.snippet}
                 </p>
 
                 <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground/60">
@@ -328,7 +340,7 @@ export function SocialMode() {
         </div>
       )}
 
-      {emails.length > 0 && (
+      {emails.length > 0 && !isDemoMode() && (
         <div className="mt-6 text-center">
           <Button
             variant="ghost"

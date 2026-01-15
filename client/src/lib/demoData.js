@@ -444,6 +444,260 @@ LinkedIn Learning Team`,
       sentiment: 'informational',
       requiresResponse: false
     }
+  },
+  {
+    id: '8',
+    from: {
+      name: 'Rahul Verma',
+      email: 'rahul.verma23@gmail.com'
+    },
+    subject: 'Weekend Cricket Match - Are you in?',
+    snippet: 'Hey Raj! We\'re organizing a cricket match this Sunday at Goregaon Sports Complex. Need one more player...',
+    body: `Hey Raj!
+
+We're organizing a cricket match this Sunday at Goregaon Sports Complex around 7 AM. Need one more player for our team!
+
+It's been a while since we played together. Rohan, Karthik, and the usual gang will be there. After the match, we're planning to grab breakfast at that new café near the complex.
+
+Let me know by tonight if you can make it!
+
+Cheers,
+Rahul`,
+    date: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(), // 8 hours ago
+    read: false,
+    starred: false,
+    labels: ['social', 'friends', 'sports'],
+    aiSummary: {
+      summary: 'Friend inviting you to cricket match this Sunday at 7 AM. Need confirmation tonight.',
+      actionable: true,
+      urgency: 'medium',
+      category: 'social',
+      keyPoints: [
+        'Cricket match Sunday 7 AM',
+        'Goregaon Sports Complex',
+        'Breakfast plans after match',
+        'Need response by tonight'
+      ],
+      suggestedTasks: [
+        'Check Sunday morning availability',
+        'Confirm attendance with Rahul',
+        'Prepare cricket gear if attending'
+      ],
+      estimatedReadTime: 1,
+      sentiment: 'friendly',
+      deadline: 'Tonight',
+      requiresResponse: true
+    }
+  },
+  {
+    id: '9',
+    from: {
+      name: 'Sneha Iyer',
+      email: 'sneha.iyer@gmail.com'
+    },
+    subject: 'Photography Walk - Gateway of India',
+    snippet: 'Hi Raj! Remember you mentioned wanting to improve your photography? I\'m organizing a sunrise photo walk...',
+    body: `Hi Raj!
+
+Remember you mentioned wanting to improve your photography? I'm organizing a sunrise photo walk at Gateway of India this Saturday at 5:30 AM!
+
+We'll cover:
+- Golden hour photography
+- Composition techniques
+- Street photography tips
+- Post-processing basics
+
+It's a small group of 6 people, all photography enthusiasts. Bring your camera/phone and let's capture some amazing shots!
+
+Interested? Drop me a message!
+
+Sneha
+Mumbai Photography Club`,
+    date: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(), // 12 hours ago
+    read: false,
+    starred: true,
+    labels: ['social', 'hobby', 'photography'],
+    aiSummary: {
+      summary: 'Photography walk invitation for Saturday 5:30 AM at Gateway of India. Covers golden hour and street photography techniques.',
+      actionable: true,
+      urgency: 'medium',
+      category: 'social',
+      keyPoints: [
+        'Saturday morning 5:30 AM',
+        'Gateway of India location',
+        'Photography techniques workshop',
+        'Small group of 6 people'
+      ],
+      suggestedTasks: [
+        'Check camera equipment',
+        'Confirm attendance with Sneha',
+        'Plan early morning transportation',
+        'Review basic photography concepts'
+      ],
+      estimatedReadTime: 1,
+      sentiment: 'enthusiastic',
+      deadline: 'Soon - Saturday morning',
+      requiresResponse: true
+    }
+  },
+  {
+    id: '10',
+    from: {
+      name: 'Kavya Reddy',
+      email: 'kavya.reddy@gmail.com'
+    },
+    subject: 'Birthday Party Invitation! 🎉',
+    snippet: 'You\'re invited to my birthday celebration next Saturday! It\'s going to be a fun evening with dinner and games...',
+    body: `Hey Raj!
+
+You're invited to my birthday celebration next Saturday, January 25th!
+
+Party Details:
+📍 Location: My apartment, Bandra West
+🕖 Time: 7:00 PM onwards
+🍽️ Dinner, music, and board games!
+
+Dress code: Casual
+RSVP by Wednesday so I can plan food accordingly.
+
+Really hope you can make it! It's been ages since we all got together.
+
+Excited to see you!
+Kavya 🎂`,
+    date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
+    read: false,
+    starred: true,
+    labels: ['social', 'friends', 'event'],
+    aiSummary: {
+      summary: 'Birthday party invitation for January 25th at 7 PM in Bandra. RSVP needed by Wednesday.',
+      actionable: true,
+      urgency: 'medium',
+      category: 'social',
+      keyPoints: [
+        'Birthday party on January 25th',
+        'Location: Bandra West, 7 PM',
+        'Dinner and board games',
+        'RSVP required by Wednesday'
+      ],
+      suggestedTasks: [
+        'Check calendar for January 25th evening',
+        'RSVP to Kavya by Wednesday',
+        'Buy birthday gift',
+        'Plan transportation to Bandra'
+      ],
+      estimatedReadTime: 1,
+      sentiment: 'excited',
+      deadline: 'Wednesday for RSVP',
+      requiresResponse: true
+    }
+  },
+  {
+    id: '11',
+    from: {
+      name: 'TCS Book Club',
+      email: 'bookclub@tcs.com'
+    },
+    subject: 'February Book Selection: "The Phoenix Project"',
+    snippet: 'Great news! Our book club has selected "The Phoenix Project" for February. First discussion on Feb 7th...',
+    body: `Hi Book Club Members!
+
+Great news! Our book club has selected "The Phoenix Project" by Gene Kim for February's reading.
+
+📚 Book: The Phoenix Project - A Novel about IT, DevOps, and Helping Your Business Win
+👥 First Discussion: Friday, February 7th at 4 PM
+📍 Location: Office Cafeteria / Teams Link
+
+This book is perfect for us tech folks - it's about IT transformations and DevOps practices told through an engaging story.
+
+Please get your copy and aim to read at least the first 5 chapters before our first meeting.
+
+Looking forward to great discussions!
+
+Priya
+TCS Book Club Coordinator`,
+    date: new Date(Date.now() - 15 * 60 * 60 * 1000).toISOString(), // 15 hours ago
+    read: false,
+    starred: false,
+    labels: ['social', 'work', 'book-club'],
+    aiSummary: {
+      summary: 'Book club selected "The Phoenix Project" for February. First discussion on Feb 7th at 4 PM. Need to read first 5 chapters.',
+      actionable: true,
+      urgency: 'low',
+      category: 'social',
+      keyPoints: [
+        'Book: The Phoenix Project',
+        'First meeting Feb 7th at 4 PM',
+        'Read first 5 chapters before meeting',
+        'Office/virtual attendance'
+      ],
+      suggestedTasks: [
+        'Order/download "The Phoenix Project"',
+        'Add reading time to weekly schedule',
+        'Mark Feb 7th discussion in calendar',
+        'Read first 5 chapters'
+      ],
+      estimatedReadTime: 2,
+      sentiment: 'informational',
+      deadline: 'Feb 7th',
+      requiresResponse: false
+    }
+  },
+  {
+    id: '12',
+    from: {
+      name: 'Meetup.com',
+      email: 'notifications@meetup.com'
+    },
+    subject: 'Upcoming: Mumbai Tech Meetup - Cloud Native Architecture',
+    snippet: 'You\'re registered for "Cloud Native Architecture Patterns" happening tomorrow at 6:30 PM...',
+    body: `Hi Raj,
+
+You're registered for the Mumbai Tech Meetup event happening tomorrow!
+
+📅 Event: Cloud Native Architecture Patterns
+🕡 Time: Tomorrow, 6:30 PM - 9:00 PM
+📍 Venue: WeWork, Lower Parel
+💡 Topics: Kubernetes, Microservices, Service Mesh
+
+Speaker: Vikram Sharma (Cloud Architect at Microsoft Azure)
+
+What to expect:
+- Deep dive into K8s patterns
+- Real-world case studies
+- Networking session
+- Free pizza & drinks!
+
+Don't forget to bring your ID for venue entry.
+
+See you there!
+Mumbai Tech Community`,
+    date: new Date(Date.now() - 18 * 60 * 60 * 1000).toISOString(), // 18 hours ago
+    read: false,
+    starred: true,
+    labels: ['social', 'tech', 'meetup', 'professional'],
+    aiSummary: {
+      summary: 'Tech meetup tomorrow at 6:30 PM on Cloud Native Architecture. Location: WeWork Lower Parel. Bring ID for entry.',
+      actionable: true,
+      urgency: 'high',
+      category: 'professional',
+      keyPoints: [
+        'Tomorrow 6:30 PM at WeWork',
+        'Topic: Cloud Native Architecture',
+        'Speaker from Microsoft Azure',
+        'Bring ID for venue entry'
+      ],
+      suggestedTasks: [
+        'Add meetup to calendar',
+        'Plan to leave office by 6 PM',
+        'Prepare questions on K8s',
+        'Remember to bring ID',
+        'Review Cloud Native basics'
+      ],
+      estimatedReadTime: 2,
+      sentiment: 'informational',
+      deadline: 'Tomorrow 6:30 PM',
+      requiresResponse: false
+    }
   }
 ];
 
