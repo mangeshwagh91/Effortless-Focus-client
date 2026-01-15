@@ -15,14 +15,18 @@ export function SocialMode() {
 
   const categoryLabels = {
     professional: { label: 'Professional', color: 'blue' },
+    work: { label: 'Work', color: 'blue' },
     financial: { label: 'Financial', color: 'emerald' },
+    finance: { label: 'Financial', color: 'emerald' },
     promotional: { label: 'Promotions', color: 'purple' },
     social: { label: 'Social', color: 'green' },
     newsletter: { label: 'Newsletters', color: 'orange' },
+    learning: { label: 'Learning', color: 'purple' },
+    personal: { label: 'Personal', color: 'pink' },
     other: { label: 'Other', color: 'gray' }
   };
 
-  const categoryOrder = ['professional', 'financial', 'promotional', 'social', 'newsletter', 'other'];
+  const categoryOrder = ['work', 'professional', 'social', 'financial', 'finance', 'learning', 'personal', 'promotional', 'newsletter', 'other'];
 
   // Group emails by category
   const emailsByCategory = emails.reduce((acc, email) => {
