@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Mail, Check, ExternalLink, RefreshCw, Bell, Inbox } from 'lucide-react';
 import { Button } from './ui/button';
 import { useAuth } from '@/hooks/useAuth';
-import { getDemoEmails } from '@/lib/demoData';
 
 export function SocialMode() {
   const [emails, setEmails] = useState([]);
@@ -11,22 +10,18 @@ export function SocialMode() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [gmailAccessToken, setGmailAccessToken] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const { isAuthenticated, isDemoMode } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   const categoryLabels = {
-    work: { label: 'Work', color: 'blue', bgClass: 'bg-blue-500/10', textClass: 'text-blue-600' },
-    professional: { label: 'Professional', color: 'blue', bgClass: 'bg-blue-500/10', textClass: 'text-blue-600' },
-    finance: { label: 'Finance', color: 'emerald', bgClass: 'bg-emerald-500/10', textClass: 'text-emerald-600' },
-    financial: { label: 'Financial', color: 'emerald', bgClass: 'bg-emerald-500/10', textClass: 'text-emerald-600' },
-    promotions: { label: 'Promotions', color: 'purple', bgClass: 'bg-purple-500/10', textClass: 'text-purple-600' },
-    promotional: { label: 'Promotions', color: 'purple', bgClass: 'bg-purple-500/10', textClass: 'text-purple-600' },
-    social: { label: 'Social', color: 'green', bgClass: 'bg-green-500/10', textClass: 'text-green-600' },
-    personal: { label: 'Personal', color: 'amber', bgClass: 'bg-amber-500/10', textClass: 'text-amber-600' },
-    newsletter: { label: 'Newsletters', color: 'orange', bgClass: 'bg-orange-500/10', textClass: 'text-orange-600' },
-    other: { label: 'Other', color: 'gray', bgClass: 'bg-gray-500/10', textClass: 'text-gray-600' }
+    professional: { label: 'Professional', color: 'blue' },
+    financial: { label: 'Financial', color: 'emerald' },
+    promotional: { label: 'Promotions', color: 'purple' },
+    social: { label: 'Social', color: 'green' },
+    newsletter: { label: 'Newsletters', color: 'orange' },
+    other: { label: 'Other', color: 'gray' }
   };
 
-  const categoryOrder = ['work', 'professional', 'finance', 'financial', 'promotions', 'promotional', 'social', 'personal', 'newsletter', 'other'];
+  const categoryOrder = ['professional', 'financial', 'promotional', 'social', 'newsletter', 'other'];
 
   // Group emails by category
   const emailsByCategory = emails.reduce((acc, email) => {
@@ -42,34 +37,6 @@ export function SocialMode() {
 
   // Check if user has connected Gmail
   useEffect(() => {
-    // In demo mode, always show demo emails
-    if (isDemoMode) {
-      const demoEmails = getDemoEmails();
-      // Transform demo emails to match expected format with category from aiSummary
-      // Filter to show only unread emails
-      const transformedEmails = demoEmails
-        .filter(email => !email.read) // Only show unread emails
-        .map(email => ({
-          ...email,
-          category: email.aiSummary?.category || 'other',
-          id: email.id,
-          from: email.from.email,
-          fromName: email.from.name,
-          subject: email.subject,
-          snippet: email.snippet,
-          body: email.body,
-          date: email.date,
-          read: email.read,
-          starred: email.starred,
-          labels: email.labels,
-          aiSummary: email.aiSummary
-        }));
-      setEmails(transformedEmails);
-      setUnreadCount(transformedEmails.length);
-      setGmailAccessToken('demo'); // Set to demo token to bypass connection screen
-      return;
-    }
-    
     if (!isAuthenticated) {
       // Clear Gmail token if user is not authenticated
       localStorage.removeItem('gmailAccessToken');
@@ -323,7 +290,7 @@ export function SocialMode() {
       ) : (
         <div className="space-y-3">
           {filteredEmails.map((email) => {
-            const catInfo = categoryLabels[email.category || 'other'] || categoryLabels['other'];
+            const catInfo = categoryLabels[email.category || 'other'];
             return (
               <div
                 key={email.id}
@@ -333,7 +300,7 @@ export function SocialMode() {
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${catInfo.bgClass} ${catInfo.textClass}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-full bg-${catInfo.color}-500/10 text-${catInfo.color}-600`}>
                         {catInfo.label}
                       </span>
                     </div>
@@ -348,7 +315,7 @@ export function SocialMode() {
                 </div>
                 
                 <p className="text-sm text-muted-foreground/90 leading-relaxed mt-3">
-                  {email.aiSummary?.summary || email.snippet}
+                  {email.aiSummary || email.snippet}
                 </p>
 
                 <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground/60">

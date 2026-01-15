@@ -11,7 +11,7 @@ import {
 } from './ui/dropdown-menu';
 
 export function Header({ aiContext, onShowAuth, onShowProfile }) {
-  const { user, isAuthenticated, isDemoMode, logout } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
   
   // Always use local time calculation for instant display
   const hour = new Date().getHours();
@@ -21,29 +21,11 @@ export function Header({ aiContext, onShowAuth, onShowProfile }) {
   if (hour < 12) greeting = 'Good morning';
   else if (hour < 17) greeting = 'Good afternoon';
   
-  // Use AI context message if available, otherwise show local contextual message
+  // Use AI context message if available, otherwise don't show message
   let contextMessage = '';
   
   if (aiContext?.message) {
     contextMessage = aiContext.message;
-  } else {
-    // Instant local fallback messages
-    if (hour >= 6 && hour < 12) {
-      contextMessage = 'Morning is perfect for your most important work.';
-    } else if (hour >= 12 && hour < 17) {
-      contextMessage = 'A good time for collaboration and follow-ups.';
-    } else if (hour >= 17 && hour < 22) {
-      contextMessage = 'Wind down with lighter tasks.';
-    }
-    
-    // Day-specific overrides
-    if (day === 1) {
-      contextMessage = 'Monday energy: Great for planning your week.';
-    } else if (day === 5) {
-      contextMessage = 'Friday: Perfect for clearing small tasks.';
-    } else if (day === 0 || day === 6) {
-      contextMessage = 'Weekend: Balance rest with personal goals.';
-    }
   }
 
   return (
@@ -76,12 +58,14 @@ export function Header({ aiContext, onShowAuth, onShowProfile }) {
                   <Settings className="w-4 h-4 mr-2" />
                   Profile Settings
                 </DropdownMenuItem>
-                {!isDemoMode && (
-                  <DropdownMenuItem onClick={logout}>
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Logout
-                  </DropdownMenuItem>
-                )}
+                <DropdownMenuItem 
+                  onClick={logout}
+                  className="text-muted-foreground cursor-not-allowed opacity-50"
+                  disabled
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Logout (Demo Mode)
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
@@ -91,6 +75,13 @@ export function Header({ aiContext, onShowAuth, onShowProfile }) {
           )}
         </div>
       </div>
+      
+      {contextMessage && (
+        <div className="flex items-center gap-1.5 mt-3 px-3 py-1.5 rounded-full bg-primary/5 border border-primary/10 max-w-full">
+          <Sparkles className="w-3 h-3 text-primary/70 flex-shrink-0" />
+          <p className="text-xs text-muted-foreground text-center">{contextMessage}</p>
+        </div>
+      )}
     </header>
   );
 }

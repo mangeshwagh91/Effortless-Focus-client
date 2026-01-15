@@ -1,5 +1,4 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import { getDemoTasks, isDemoMode as checkDemoMode } from '../lib/demoData';
 
 const generateId = () => Math.random().toString(36).substring(2, 9);
 
@@ -90,17 +89,6 @@ const SEED_TASKS = [
 
 // Load tasks from localStorage
 const loadTasks = () => {
-  // Check if we're in demo mode first
-  if (checkDemoMode()) {
-    const demoTasks = getDemoTasks();
-    // Convert demo tasks to proper format with Date objects
-    return demoTasks.map(task => ({
-      ...task,
-      createdAt: task.createdAt ? new Date(task.createdAt) : new Date(),
-      completedAt: task.completedAt ? new Date(task.completedAt) : null,
-    }));
-  }
-  
   // Don't load tasks if user is not authenticated
   const token = localStorage.getItem('authToken');
   if (!token) {

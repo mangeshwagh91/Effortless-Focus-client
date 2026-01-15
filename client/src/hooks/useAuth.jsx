@@ -1,8 +1,5 @@
 import { useState, useEffect, createContext, useContext } from 'react';
-import { demoUser, enableDemoMode, getDemoUser } from '../lib/demoData';
-
-// Enable demo mode immediately (before any components render)
-enableDemoMode();
+import { demoUser, isDemoMode, loadDemoData } from '../lib/demoData';
 
 const AuthContext = createContext(null);
 
@@ -19,24 +16,40 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('authToken'));
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isDemoMode, setIsDemoMode] = useState(true); // Always in demo mode for prototype
 
   const API_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api`;
 
-  // Initialize demo mode on mount (for prototype/judges)
+  // Always initialize with demo user for judges
   useEffect(() => {
-    enableDemoMode();
+    // Ensure demo mode is enabled
+    if (!isDemoMode()) {
+      loadDemoData();
+    }
+    
+    // Auto-login with demo user
+    const demoToken = 'demo-token-12345';
+    setToken(demoToken);
     setUser(demoUser);
-    setIsDemoMode(true);
+    localStorage.setItem('authToken', demoToken);
     setLoading(false);
   }, []);
 
-  // Load user on mount if token exists (for production mode - currently disabled)
+  // Load user on mount if token exists
   useEffect(() => {
-    if (!isDemoMode && token) {
+    if (token && token !== 'demo-token-12345') {
       fetchCurrentUser();
+    } else if (token === 'demo-token-12345') {
+      // Demo mode - use demo user
+      setUser(demoUser);
+      setLoading(false);
+    } else {
+      // No token - still use demo user for evaluation
+      setUser(demoUser);
+      setToken('demo-token-12345');
+      localStorage.setItem('authToken', 'demo-token-12345');
+      setLoading(false);
     }
-  }, [token, isDemoMode]);
+  }, [token]);
 
   const fetchCurrentUser = async () => {
     try {
@@ -122,21 +135,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    // Prevent logout in demo mode (for judges/prototype)
-    if (isDemoMode) {
-      console.log('Logout disabled in demo mode');
-      return;
-    }
-    
-    setToken(null);
-    setUser(null);
-    localStorage.removeItem('authToken');
-    // Clear all app data on logout
-    localStorage.removeItem('effortless-focus-tasks');
-    localStorage.removeItem('demo_mode');
-    localStorage.removeItem('demo_emails');
-    localStorage.removeItem('demo_tasks');
-    localStorage.removeItem('demo_user');
+    // Logout disabled for demo/evaluation mode
+    console.log('⚠️ Logout is disabled in demo mode for evaluation purposes');
+    // Don't actually log out - just show a message
+    alert('Logout is disabled for demo purposes. User remains logged in for judges to evaluate.');
+    return;
   };
 
   const updatePreferences = async (preferences) => {
@@ -169,7 +172,6 @@ export const AuthProvider = ({ children }) => {
     loading,
     error,
     isAuthenticated: !!user,
-    isDemoMode,
     register,
     login,
     logout,

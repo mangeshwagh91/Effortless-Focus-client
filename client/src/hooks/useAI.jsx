@@ -10,7 +10,7 @@ export function useAI() {
   const [aiContext, setAiContext] = useState(null);
 
   /**
-   * Analyze a task using AI
+   * Analyze a task using Grok AI
    */
   const analyzeTask = useCallback(async (taskText, existingTasks = []) => {
     setIsAnalyzing(true);
@@ -47,11 +47,6 @@ export function useAI() {
    * Get AI suggestion for which task to focus on
    */
   const getFocusSuggestion = useCallback(async (tasks, completedToday = 0) => {
-    // Skip API calls in demo mode
-    if (localStorage.getItem('demo_mode') === 'true') {
-      return null;
-    }
-    
     try {
       const response = await fetch(`${API_BASE}/focus-suggestion`, {
         method: 'POST',
@@ -72,11 +67,6 @@ export function useAI() {
    * Fetch current context (time of day, day of week, etc.)
    */
   const fetchContext = useCallback(async () => {
-    // Skip API calls in demo mode
-    if (localStorage.getItem('demo_mode') === 'true') {
-      return;
-    }
-    
     try {
       const response = await fetch(`${API_BASE}/context`);
       if (!response.ok) throw new Error('Context fetch failed');
@@ -85,10 +75,7 @@ export function useAI() {
       setAiContext(data);
       return data;
     } catch (error) {
-      // Silently fail in demo mode
-      if (localStorage.getItem('demo_mode') !== 'true') {
-        console.error('Context fetch error:', error);
-      }
+      console.error('Context fetch error:', error);
       // Fallback to local time context
       const now = new Date();
       const hour = now.getHours();
@@ -106,7 +93,7 @@ export function useAI() {
       } else if (hour >= 17 && hour < 22) {
         timeOfDay = 'evening';
         greeting = 'Good evening';
-        message = 'Wind down with lighter tasks.';
+        message = '';
       } else {
         timeOfDay = 'night';
         greeting = 'Hello';

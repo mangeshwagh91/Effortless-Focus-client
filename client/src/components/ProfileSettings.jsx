@@ -7,11 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Alert, AlertDescription } from './ui/alert';
 import { X, RefreshCw } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
-import { getDemoUser } from '@/lib/demoData';
 
 export function ProfileSettings({ onClose, onOpenOnboarding }) {
-  const { isDemoMode } = useAuth();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -61,28 +58,6 @@ export function ProfileSettings({ onClose, onOpenOnboarding }) {
   const loadProfile = async () => {
     setLoading(true);
     try {
-      // In demo mode, load demo user profile
-      if (isDemoMode) {
-        const demoUser = getDemoUser();
-        if (demoUser.userProfile) {
-          setProfile(prev => {
-            const merged = { ...prev };
-            Object.keys(demoUser.userProfile).forEach(key => {
-              if (demoUser.userProfile[key] && typeof demoUser.userProfile[key] === 'object') {
-                merged[key] = { ...prev[key], ...demoUser.userProfile[key] };
-              } else if (demoUser.userProfile[key] !== undefined) {
-                merged[key] = demoUser.userProfile[key];
-              }
-            });
-            return merged;
-          });
-        }
-        setCompleteness(85); // Demo profile is fairly complete
-        setError('');
-        setLoading(false);
-        return;
-      }
-      
       const token = localStorage.getItem('authToken');
       const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/profile`, {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -146,13 +121,6 @@ export function ProfileSettings({ onClose, onOpenOnboarding }) {
   };
 
   const handleSave = async () => {
-    // In demo mode, just show success message without saving
-    if (isDemoMode) {
-      setSuccess('Profile viewed! (Demo mode - changes not saved)');
-      setTimeout(() => setSuccess(''), 3000);
-      return;
-    }
-    
     setSaving(true);
     setError('');
     setSuccess('');

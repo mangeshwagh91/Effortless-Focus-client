@@ -1,8 +1,9 @@
-import { Focus, Wind, List, Shuffle, Bell } from 'lucide-react';
+import { Focus, Wind, List, Shuffle, Bell, Calendar } from 'lucide-react';
 
 const modes = [
   { value: 'focus', icon: Focus, label: 'Focus' },
   { value: 'review', icon: List, label: 'Review' },
+  { value: 'routine', icon: Calendar, label: 'Routine' },
   { value: 'decisions', icon: Shuffle, label: 'Decide' },
   { value: 'social', icon: Bell, label: 'Social' },
   { value: 'breathe', icon: Wind, label: 'Breathe' },
