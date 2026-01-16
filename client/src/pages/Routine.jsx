@@ -98,6 +98,204 @@ const Routine = () => {
   const filteredTasks = tasks.filter(t => !t.completed);
   const completedTasks = tasks.filter(t => t.completed);
 
+  // Generate time-scheduled plan
+  const generateTimeSchedule = () => {
+    const schedule = [];
+    const today = new Date();
+    
+    // Start with morning routine
+    let currentTime = new Date(today);
+    currentTime.setHours(7, 0, 0, 0);
+    
+    const addTimeBlock = (duration, title, type, data = {}) => {
+      const endTime = new Date(currentTime.getTime() + duration * 60000);
+      schedule.push({
+        id: Math.random().toString(36).substring(7),
+        startTime: new Date(currentTime),
+        endTime: new Date(endTime),
+        duration,
+        title,
+        type, // 'routine' | 'task' | 'break'
+        ...data
+      });
+      currentTime = endTime;
+    };
+    
+    // Morning routine blocks
+    addTimeBlock(30, 'Wake Up & Morning Routine', 'break');
+    addTimeBlock(30, 'Breakfast', 'break');
+    addTimeBlock(30, 'Commute to Office', 'break');
+    
+    // Get active routines and sort by priority and time preference
+    const activeRoutines = routines.filter(r => r.isActive);
+    const morningRoutines = activeRoutines.filter(r => r.preferredTimeOfDay === 'morning');
+    const eveningRoutines = activeRoutines.filter(r => r.preferredTimeOfDay === 'evening');
+    const anytimeRoutines = activeRoutines.filter(r => 
+      r.preferredTimeOfDay !== 'morning' && 
+      r.preferredTimeOfDay !== 'evening' &&
+      r.preferredTimeOfDay !== 'weekend'
+    );
+    
+    // Get tasks sorted by urgency
+    const urgentTasks = filteredTasks.filter(t => t.urgency === 'now');
+    const soonTasks = filteredTasks.filter(t => t.urgency === 'soon');
+    const laterTasks = filteredTasks.filter(t => t.urgency === 'later');
+    
+    // Morning work blocks (8:30 AM - 12:00 PM)
+    // Add urgent tasks first
+    urgentTasks.forEach(task => {
+      addTimeBlock(
+        task.estimatedMinutes || 30,
+        task.title,
+        'task',
+        { 
+          priority: 'High Priority',
+          urgency: task.urgency,
+          taskId: task.id,
+          task: task
+        }
+      );
+    });
+    
+    // Add morning routines
+    morningRoutines.forEach(routine => {
+      const duration = routine.avgCompletionMinutes || 
+        { heavy: 90, medium: 60, light: 30 }[routine.mentalLoad] || 60;
+      
+      addTimeBlock(
+        duration,
+        routine.title,
+        'routine',
+        {
+          priority: `${routine.priority.charAt(0).toUpperCase() + routine.priority.slice(1)} Priority`,
+          routineId: routine.id,
+          routine: routine
+        }
+      );
+    });
+    
+    // Morning break
+    if (currentTime.getHours() < 12) {
+      addTimeBlock(15, 'Morning Coffee Break', 'break');
+    }
+    
+    // Add soon tasks if before lunch
+    if (currentTime.getHours() < 12 && soonTasks.length > 0) {
+      const task = soonTasks[0];
+      addTimeBlock(
+        task.estimatedMinutes || 30,
+        task.title,
+        'task',
+        {
+          priority: 'Medium Priority',
+          urgency: task.urgency,
+          taskId: task.id,
+          task: task
+        }
+      );
+    }
+    
+    // Lunch break
+    if (currentTime.getHours() < 13) {
+      currentTime.setHours(12, 30, 0, 0);
+      addTimeBlock(60, 'Lunch Break', 'break');
+    }
+    
+    // Afternoon work blocks (1:30 PM - 5:30 PM)
+    // Add anytime routines
+    anytimeRoutines.forEach(routine => {
+      const duration = routine.avgCompletionMinutes || 
+        { heavy: 90, medium: 60, light: 30 }[routine.mentalLoad] || 60;
+      
+      addTimeBlock(
+        duration,
+        routine.title,
+        'routine',
+        {
+          priority: `${routine.priority.charAt(0).toUpperCase() + routine.priority.slice(1)} Priority`,
+          routineId: routine.id,
+          routine: routine
+        }
+      );
+    });
+    
+    // Add remaining soon tasks
+    soonTasks.slice(1).forEach(task => {
+      addTimeBlock(
+        task.estimatedMinutes || 30,
+        task.title,
+        'task',
+        {
+          priority: 'Medium Priority',
+          urgency: task.urgency,
+          taskId: task.id,
+          task: task
+        }
+      );
+    });
+    
+    // Afternoon break
+    if (currentTime.getHours() >= 14 && currentTime.getHours() < 17) {
+      addTimeBlock(15, 'Afternoon Tea Break', 'break');
+    }
+    
+    // Commute home
+    if (currentTime.getHours() < 18) {
+      currentTime.setHours(17, 30, 0, 0);
+      addTimeBlock(30, 'Commute from Office', 'break');
+    }
+    
+    // Evening blocks (6:00 PM onwards)
+    // Add evening routines
+    eveningRoutines.forEach(routine => {
+      const duration = routine.avgCompletionMinutes || 
+        { heavy: 90, medium: 60, light: 30 }[routine.mentalLoad] || 60;
+      
+      addTimeBlock(
+        duration,
+        routine.title,
+        'routine',
+        {
+          priority: `${routine.priority.charAt(0).toUpperCase() + routine.priority.slice(1)} Priority`,
+          routineId: routine.id,
+          routine: routine
+        }
+      );
+    });
+    
+    // Dinner
+    if (currentTime.getHours() >= 19 && currentTime.getHours() < 21) {
+      currentTime.setHours(19, 30, 0, 0);
+      addTimeBlock(60, 'Dinner', 'break');
+    }
+    
+    // Add later tasks in evening if time permits
+    laterTasks.forEach(task => {
+      if (currentTime.getHours() < 22) {
+        addTimeBlock(
+          task.estimatedMinutes || 30,
+          task.title,
+          'task',
+          {
+            priority: 'Low Priority',
+            urgency: task.urgency,
+            taskId: task.id,
+            task: task
+          }
+        );
+      }
+    });
+    
+    // Evening wind down
+    if (currentTime.getHours() < 23) {
+      addTimeBlock(60, 'Evening Wind Down', 'break');
+    }
+    
+    return schedule;
+  };
+  
+  const timeSchedule = generateTimeSchedule();
+
   return (
     <div className="min-h-screen w-full px-4 py-8">
       <div className="max-w-4xl mx-auto">
@@ -148,121 +346,262 @@ const Routine = () => {
               </TabsList>
 
               <TabsContent value="routine" className="space-y-6">
-        {/* Time Capacity Card */}
-        <div className="mb-6 bg-card rounded-2xl border border-border/40 shadow-soft p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Clock className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-semibold">Available Focus Time</h2>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowTimeSetup(!showTimeSetup)}
-              className="transition-all duration-200 hover:scale-110 active:scale-95"
-            >
-              <Settings className="w-4 h-4" />
-            </Button>
-          </div>
+                {/* Time Capacity Card */}
+                <div className="mb-6 bg-card rounded-2xl border border-border/40 shadow-soft p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-5 h-5 text-primary" />
+                      <h2 className="text-lg font-semibold">Available Focus Time</h2>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowTimeSetup(!showTimeSetup)}
+                      className="transition-all duration-200 hover:scale-110 active:scale-95"
+                    >
+                      <Settings className="w-4 h-4" />
+                    </Button>
+                  </div>
 
-          {showTimeSetup ? (
-            <div className="space-y-4 animate-fade-in">
-              <TimeCapacityEditor
-                type="weekday"
-                capacity={timeCapacity.weekday}
-                onUpdate={(data) => updateTimeCapacity('weekday', data)}
-              />
-              <TimeCapacityEditor
-                type="weekend"
-                capacity={timeCapacity.weekend}
-                onUpdate={(data) => updateTimeCapacity('weekend', data)}
-              />
-              <Button onClick={() => setShowTimeSetup(false)} className="w-full transition-all duration-200 hover:scale-[1.02] active:scale-98">
-                Save Time Settings
-              </Button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 transition-all duration-300 hover:scale-[1.02] hover:bg-primary/10 hover:shadow-soft cursor-pointer">
-                <p className="text-xs text-muted-foreground mb-1">Weekdays</p>
-                <p className="text-2xl font-bold text-primary">
-                  {formatTime(timeCapacity.weekday.totalMinutes)}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {timeCapacity.weekday.start} - {timeCapacity.weekday.end}
-                </p>
-              </div>
-              <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 transition-all duration-300 hover:scale-[1.02] hover:bg-primary/10 hover:shadow-soft cursor-pointer">
-                <p className="text-xs text-muted-foreground mb-1">Weekends</p>
-                <p className="text-2xl font-bold text-primary">
-                  {formatTime(timeCapacity.weekend.totalMinutes)}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {timeCapacity.weekend.start} - {timeCapacity.weekend.end}
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Routines List */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Your Routine Tasks</h2>
-            <Button onClick={() => setShowAddForm(!showAddForm)} size="sm" className="transition-all duration-200 hover:scale-105 active:scale-95">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Routine
-            </Button>
-          </div>
-
-          {showAddForm && (
-            <div className="mb-4 p-6 bg-card rounded-2xl border border-border/40 shadow-soft animate-slide-down">
-              <RoutineForm
-                routine={newRoutine}
-                onChange={setNewRoutine}
-                onSubmit={handleAddRoutine}
-                onCancel={() => setShowAddForm(false)}
-              />
-            </div>
-          )}
-
-          {routines.length === 0 ? (
-            <div className="text-center py-12 bg-card rounded-2xl border border-border/40">
-              <Calendar className="w-12 h-12 text-muted-foreground/50 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-foreground mb-2">
-                No Routines Yet
-              </h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Add your regular focus areas like DSA, React, or Hackathon prep
-              </p>
-              <Button onClick={() => setShowAddForm(true)}>
-                Add Your First Routine
-              </Button>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {routines.map((routine, index) => (
-                <div
-                  key={routine.id}
-                  className="animate-fade-in"
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
-                  <RoutineCard
-                    routine={routine}
-                    onToggle={() => toggleRoutine(routine.id)}
-                    onDelete={() => deleteRoutine(routine.id)}
-                  />
+                  {showTimeSetup ? (
+                    <div className="space-y-4 animate-fade-in">
+                      <TimeCapacityEditor
+                        type="weekday"
+                        capacity={timeCapacity.weekday}
+                        onUpdate={(data) => updateTimeCapacity('weekday', data)}
+                      />
+                      <TimeCapacityEditor
+                        type="weekend"
+                        capacity={timeCapacity.weekend}
+                        onUpdate={(data) => updateTimeCapacity('weekend', data)}
+                      />
+                      <Button onClick={() => setShowTimeSetup(false)} className="w-full transition-all duration-200 hover:scale-[1.02] active:scale-98">
+                        Save Time Settings
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 transition-all duration-300 hover:scale-[1.02] hover:bg-primary/10 hover:shadow-soft cursor-pointer">
+                        <p className="text-xs text-muted-foreground mb-1">Weekdays</p>
+                        <p className="text-2xl font-bold text-primary">
+                          {formatTime(timeCapacity.weekday.totalMinutes)}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {timeCapacity.weekday.start} - {timeCapacity.weekday.end}
+                        </p>
+                      </div>
+                      <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 transition-all duration-300 hover:scale-[1.02] hover:bg-primary/10 hover:shadow-soft cursor-pointer">
+                        <p className="text-xs text-muted-foreground mb-1">Weekends</p>
+                        <p className="text-2xl font-bold text-primary">
+                          {formatTime(timeCapacity.weekend.totalMinutes)}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {timeCapacity.weekend.start} - {timeCapacity.weekend.end}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+
+                {/* Routines List */}
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-semibold">Your Routine Tasks</h2>
+                    <Button onClick={() => setShowAddForm(!showAddForm)} size="sm" className="transition-all duration-200 hover:scale-105 active:scale-95">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Routine
+                    </Button>
+                  </div>
+
+                  {showAddForm && (
+                    <div className="mb-4 p-6 bg-card rounded-2xl border border-border/40 shadow-soft animate-slide-down">
+                      <RoutineForm
+                        routine={newRoutine}
+                        onChange={setNewRoutine}
+                        onSubmit={handleAddRoutine}
+                        onCancel={() => setShowAddForm(false)}
+                      />
+                    </div>
+                  )}
+
+                  {routines.length === 0 ? (
+                    <div className="text-center py-12 bg-card rounded-2xl border border-border/40">
+                      <Calendar className="w-12 h-12 text-muted-foreground/50 mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-foreground mb-2">
+                        No Routines Yet
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Add your regular focus areas like DSA, React, or Hackathon prep
+                      </p>
+                      <Button onClick={() => setShowAddForm(true)}>
+                        Add Your First Routine
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {routines.map((routine, index) => (
+                        <div
+                          key={routine.id}
+                          className="animate-fade-in"
+                          style={{ animationDelay: `${index * 50}ms` }}
+                        >
+                          <RoutineCard
+                            routine={routine}
+                            onToggle={() => toggleRoutine(routine.id)}
+                            onDelete={() => deleteRoutine(routine.id)}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+
+              {/* Today's Smart Plan Tab */}
+              <TabsContent value="plan" className="space-y-6">
+                <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl border border-primary/20 p-6">
+                  <div className="mb-6 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-6 h-6 text-primary" />
+                      <h2 className="text-xl font-semibold text-foreground">Today's Smart Plan</h2>
+                    </div>
+                    <Button variant="ghost" size="sm" className="text-primary hover:text-primary" onClick={handleGeneratePlan}>
+                      Regenerate
+                    </Button>
+                  </div>
+
+                  {/* Time Schedule */}
+                  {timeSchedule.length > 0 ? (
+                    <div className="space-y-2">
+                      {timeSchedule.map((block, index) => {
+                        const startTime = block.startTime.toLocaleTimeString('en-US', { 
+                          hour: 'numeric', 
+                          minute: '2-digit',
+                          hour12: true 
+                        });
+                        const endTime = block.endTime.toLocaleTimeString('en-US', { 
+                          hour: 'numeric', 
+                          minute: '2-digit',
+                          hour12: true 
+                        });
+                        
+                        const isBreak = block.type === 'break';
+                        const isTask = block.type === 'task';
+                        const isRoutine = block.type === 'routine';
+                        
+                        return (
+                          <div
+                            key={block.id}
+                            className={`flex items-center gap-4 p-4 rounded-xl border transition-all ${
+                              isBreak 
+                                ? 'bg-muted/30 border-muted-foreground/20' 
+                                : 'bg-card border-border/40 hover:shadow-soft hover:border-primary/30'
+                            }`}
+                          >
+                            {/* Time */}
+                            <div className="flex-shrink-0 text-sm text-muted-foreground font-medium min-w-[140px]">
+                              {startTime} - {endTime}
+                            </div>
+
+                            {/* Icon */}
+                            <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                              isBreak ? 'bg-muted' : 'bg-primary/10'
+                            }`}>
+                              <Clock className={`w-4 h-4 ${isBreak ? 'text-muted-foreground' : 'text-primary'}`} />
+                            </div>
+
+                            {/* Content */}
+                            <div className="flex-1 min-w-0">
+                              <h3 className={`font-medium ${isBreak ? 'text-muted-foreground' : 'text-foreground'}`}>
+                                {block.title}
+                              </h3>
+                              {block.priority && !isBreak && (
+                                <Badge 
+                                  variant={block.priority === 'High Priority' ? 'destructive' : 'secondary'} 
+                                  className="text-xs mt-1"
+                                >
+                                  {block.priority}
+                                </Badge>
+                              )}
+                            </div>
+
+                            {/* Start Button */}
+                            {!isBreak && (
+                              <Button 
+                                className="flex-shrink-0 bg-primary hover:bg-primary/90"
+                                onClick={() => {
+                                  if (isTask && block.task) {
+                                    handleStartBlock({ 
+                                      ...block.task, 
+                                      duration: block.duration 
+                                    });
+                                  } else if (isRoutine && block.routine) {
+                                    handleStartBlock({ 
+                                      ...block.routine, 
+                                      routineId: block.routineId,
+                                      duration: block.duration 
+                                    });
+                                  }
+                                }}
+                              >
+                                Start
+                              </Button>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <List className="w-12 h-12 mx-auto mb-4 text-muted-foreground/30" />
+                      <h3 className="text-lg font-medium text-foreground mb-2">No items in plan</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Add tasks or create routines to get started
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Your Routines Section */}
+                <div className="bg-card rounded-2xl border border-border/40 shadow-soft p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-foreground">Your Routines</h3>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => setShowAddForm(!showAddForm)}
+                      className="flex items-center gap-2"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add Routine
+                    </Button>
+                  </div>
+
+                  <div className="space-y-2">
+                    {routines.map(routine => (
+                      <RoutineCard
+                        key={routine.id}
+                        routine={routine}
+                        onToggle={() => toggleRoutine(routine.id)}
+                        onDelete={() => deleteRoutine(routine.id)}
+                      />
+                    ))}
+                    
+                    {routines.length === 0 && !showAddForm && (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <p className="text-sm">No routines yet. Create your first one!</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
           </>
         )}
       </div>
     </div>
   );
-};
+}
 
 // Time Capacity Editor Component
 function TimeCapacityEditor({ type, capacity, onUpdate }) {
@@ -456,173 +795,6 @@ function RoutineCard({ routine, onToggle, onDelete }) {
             <Trash2 className="w-4 h-4" />
           </button>
         </div>
-      </div>
-    </div>
-  );
-}
-
-// Time Block Component
-function TimeBlock({ block, index, isActive, onStart, formatTime }) {
-  const priorityColor = {
-    high: 'border-l-red-500',
-    medium: 'border-l-yellow-500',
-    low: 'border-l-green-500',
-  }[block.priority] || 'border-l-primary';
-
-  return (
-    <div className={`p-4 rounded-xl border-l-4 ${priorityColor} transition-all duration-300 ease-out ${
-      isActive 
-        ? 'bg-primary/10 border border-primary/30 scale-[1.02] shadow-md' 
-        : 'bg-card border border-border/40 hover:scale-[1.01] hover:shadow-soft hover:border-primary/20'
-    }`}>
-      <div className="flex items-center justify-between">
-        <div className="flex-1">
-          <div className="flex items-center gap-3 mb-1">
-            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/20 text-primary text-xs font-bold">
-              {index + 1}
-            </span>
-            <h4 className="font-medium">{block.title}</h4>
-            <Badge variant="secondary" className="text-xs">
-              {formatTime(block.duration)}
-            </Badge>
-          </div>
-          {block.reason && (
-            <p className="text-xs text-muted-foreground ml-9">{block.reason}</p>
-          )}
-        </div>
-        {!isActive && (
-          <Button onClick={onStart} size="sm" variant="outline" className="transition-all duration-200 hover:scale-105 active:scale-95">
-            Start
-          </Button>
-        )}
-        {isActive && (
-          <Badge className="bg-green-500 text-white animate-pulse-soft shadow-md">
-            Active
-          </Badge>
-        )}
-      </div>
-    </div>
-  );
-}
-
-              </TabsContent>
-
-              {/* Today's Smart Plan Tab */}
-              <TabsContent value="plan" className="space-y-6">
-                <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl border border-primary/20 p-6">
-                  <div className="mb-6 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-6 h-6 text-primary" />
-                      <h2 className="text-xl font-semibold text-foreground">Today's Smart Plan</h2>
-                    </div>
-                    <Button variant="ghost" size="sm" className="text-primary hover:text-primary">
-                      Regenerate
-                    </Button>
-                  </div>
-
-                  {/* Stats */}
-                  {filteredTasks.length > 0 && (
-                    <div className="grid grid-cols-3 gap-4 mb-6">
-                      <div className="text-center p-4 rounded-xl bg-background/50 backdrop-blur">
-                        <div className="text-3xl font-bold text-foreground">{filteredTasks.length}</div>
-                        <div className="text-sm text-muted-foreground mt-1">Blocks</div>
-                      </div>
-                      <div className="text-center p-4 rounded-xl bg-background/50 backdrop-blur">
-                        <div className="text-3xl font-bold text-primary">
-                          {Math.floor(filteredTasks.reduce((sum, t) => sum + (t.estimatedMinutes || 30), 0) / 60)}h
-                        </div>
-                        <div className="text-sm text-muted-foreground mt-1">Allocated</div>
-                      </div>
-                      <div className="text-center p-4 rounded-xl bg-background/50 backdrop-blur">
-                        <div className="text-3xl font-bold text-muted-foreground">0m</div>
-                        <div className="text-sm text-muted-foreground mt-1">Buffer</div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Task Blocks */}
-                  {filteredTasks.length > 0 && (
-                    <div className="space-y-3">
-                    {filteredTasks.map((task, index) => {
-                      const urgency = task.urgency || 'soon';
-                      const isHighPriority = urgency === 'now';
-                      
-                      return (
-                        <div
-                          key={task.id}
-                          className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border/40 hover:shadow-soft transition-all"
-                        >
-                          {/* Number Badge */}
-                          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 text-primary font-semibold flex items-center justify-center">
-                            {index + 1}
-                          </div>
-
-                          {/* Task Info */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-3 mb-1">
-                              <h3 className="font-medium text-foreground">{task.title}</h3>
-                              <span className="text-sm text-muted-foreground">
-                                {task.estimatedMinutes ? 
-                                  task.estimatedMinutes >= 60 ? 
-                                    `${Math.floor(task.estimatedMinutes / 60)}h ${task.estimatedMinutes % 60 > 0 ? task.estimatedMinutes % 60 + 'min' : ''}` 
-                                    : `${task.estimatedMinutes}min`
-                                  : '30min'
-                                }
-                              </span>
-                            </div>
-                            {(isHighPriority || task.insight) && (
-                              <p className="text-sm text-muted-foreground">
-                                {isHighPriority && 'High priority task'}
-                                {isHighPriority && task.bestTimeOfDay && ' • '}
-                                {task.bestTimeOfDay && `Peak focus window`}
-                                {!isHighPriority && task.insight && task.insight}
-                              </p>
-                            )}
-                          </div>
-
-                          {/* Start Button */}
-                          <Button 
-                            className="flex-shrink-0 bg-primary hover:bg-primary/90"
-                            onClick={() => handleStartBlock({ ...task, duration: task.estimatedMinutes || 30 })}
-                          >
-                            Start
-                          </Button>
-                        </div>
-                      );
-                    })}
-                    </div>
-                  )}
-                </div>
-
-                {/* Completed Tasks */}
-                {completedTasks.length > 0 && (
-                  <div className="space-y-3 pt-6 border-t border-border/40">
-                    <div className="flex items-center justify-between px-2">
-                      <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                        Completed Today ({completedTasks.length})
-                      </h4>
-                    </div>
-                    <div className="space-y-2 opacity-60">
-                      {completedTasks.map(task => (
-                        <div 
-                          key={task.id}
-                          className="group flex items-center gap-3 px-4 py-3 rounded-xl bg-card border border-border/40 transition-all duration-200"
-                        >
-                          <div className="w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 bg-zen-success/20 border-zen-success">
-                            <Check className="w-3 h-3 text-zen-success" />
-                          </div>
-                          <span className="flex-1 text-sm line-through text-muted-foreground">
-                            {task.title}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </TabsContent>
-            </Tabs>
-          </>
-        )}
       </div>
     </div>
   );

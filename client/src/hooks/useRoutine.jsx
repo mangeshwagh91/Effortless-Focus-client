@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
+import { getDemoRoutines } from '../lib/demoData';
 
 const generateId = () => Math.random().toString(36).substring(2, 9);
 const ROUTINES_KEY = 'effortless-focus-routines';
@@ -9,7 +10,16 @@ const ROUTINE_HISTORY_KEY = 'effortless-focus-routine-history';
 const loadRoutines = () => {
   try {
     const saved = localStorage.getItem(ROUTINES_KEY);
-    return saved ? JSON.parse(saved) : [];
+    if (saved) {
+      return JSON.parse(saved);
+    }
+    // If no routines in storage, load demo routines
+    const demoRoutines = getDemoRoutines();
+    if (demoRoutines.length > 0) {
+      localStorage.setItem(ROUTINES_KEY, JSON.stringify(demoRoutines));
+      return demoRoutines;
+    }
+    return [];
   } catch (error) {
     console.error('Failed to load routines:', error);
     return [];

@@ -731,20 +731,6 @@ export const demoTasks = [
     createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
     dueDate: new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString()
   },
-  {
-    id: '3',
-    title: 'Book appointment for bike service',
-    completed: false,
-    urgency: 'now',
-    category: 'personal',
-    estimatedMinutes: 10,
-    insight: 'Quick call during a short break. Don\'t let this slip!',
-    bestTimeOfDay: 'anytime',
-    aiPowered: true,
-    tags: ['phone_call', 'vehicle'],
-    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-    dueDate: new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString()
-  },
   
   // Soon tasks
   {
@@ -761,62 +747,6 @@ export const demoTasks = [
     createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
     dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString()
   },
-  {
-    id: '5',
-    title: 'Prepare presentation for Friday\'s sprint review',
-    completed: false,
-    urgency: 'soon',
-    category: 'work',
-    estimatedMinutes: 60,
-    insight: 'Break this into smaller chunks: outline (15 min), slides (30 min), practice (15 min).',
-    bestTimeOfDay: 'afternoon',
-    aiPowered: true,
-    tags: ['presentation', 'work', 'meeting'],
-    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-    dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString()
-  },
-  {
-    id: '6',
-    title: 'Update project documentation',
-    completed: false,
-    urgency: 'soon',
-    category: 'work',
-    estimatedMinutes: 45,
-    insight: 'Document while the implementation is fresh in your mind. Perfect for post-lunch focus.',
-    bestTimeOfDay: 'afternoon',
-    aiPowered: true,
-    tags: ['documentation', 'work'],
-    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-    dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString()
-  },
-  {
-    id: '7',
-    title: 'Buy groceries for the week',
-    completed: false,
-    urgency: 'soon',
-    category: 'personal',
-    estimatedMinutes: 60,
-    insight: 'Weekend morning would be ideal. Make a list beforehand to save time.',
-    bestTimeOfDay: 'morning',
-    aiPowered: true,
-    tags: ['shopping', 'groceries'],
-    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString()
-  },
-  {
-    id: '8',
-    title: 'Call parents',
-    completed: false,
-    urgency: 'soon',
-    category: 'personal',
-    estimatedMinutes: 30,
-    insight: 'Evening after dinner is your usual family time. Perfect for a relaxed conversation.',
-    bestTimeOfDay: 'evening',
-    aiPowered: true,
-    tags: ['family', 'phone_call'],
-    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    dueDate: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString()
-  },
   
   // Later tasks
   {
@@ -831,45 +761,6 @@ export const demoTasks = [
     aiPowered: true,
     tags: ['research', 'side_project', 'learning'],
     createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString()
-  },
-  {
-    id: '10',
-    title: 'Plan weekend trip to Goa',
-    completed: false,
-    urgency: 'later',
-    category: 'personal',
-    estimatedMinutes: 45,
-    insight: 'Fun planning activity! Perfect for a relaxed evening when you want a mental break.',
-    bestTimeOfDay: 'evening',
-    aiPowered: true,
-    tags: ['travel', 'planning', 'fun'],
-    createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
-  },
-  {
-    id: '11',
-    title: 'Clean and organize home office',
-    completed: false,
-    urgency: 'later',
-    category: 'personal',
-    estimatedMinutes: 90,
-    insight: 'A clean workspace boosts productivity. Perfect for weekend morning.',
-    bestTimeOfDay: 'morning',
-    aiPowered: true,
-    tags: ['home', 'organization'],
-    createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString()
-  },
-  {
-    id: '12',
-    title: 'Read "System Design Interview" book chapter 4',
-    completed: false,
-    urgency: 'later',
-    category: 'learning',
-    estimatedMinutes: 45,
-    insight: 'Continue your learning journey. Evening reading session works best for you.',
-    bestTimeOfDay: 'evening',
-    aiPowered: true,
-    tags: ['reading', 'system_design', 'learning'],
-    createdAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString()
   }
 ];
 
